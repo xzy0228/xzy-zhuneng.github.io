@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>云筑服务筑能站 V13 - 漫游指引版</title>
+    <title>云筑服务筑能站 V13 - 终极整合版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     
     <style>
         /* === 1. 全局基础 === */
-        body { font-family: 'Noto Sans SC', sans-serif; background-color: #f0f2f5; color: #333; overflow: hidden; }
+        body { font-family: 'Noto Sans SC', sans-serif; background-color: #f0f2f5; color: #333; overflow-x: hidden; }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .font-num { font-family: 'Inter', sans-serif; }
-        .text-truncate-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        .text-truncate-1 { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .line-truncate-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
-        /* === 2. 左侧原型导航 (全局) === */
+        /* === 2. 左侧原型导航 === */
         .prototype-sidebar {
             position: fixed; left: 0; top: 0; bottom: 0; width: 140px; 
             background: #001529; color: #a6adb4; z-index: 20000;
@@ -33,90 +33,147 @@
         .proto-item:hover { color: white; background: #1890ff; }
         .proto-item.active { color: white; background: #1890ff; border-left-color: #fff; font-weight: bold; }
 
-        /* === 3. 主视口容器 === */
-        /* 注意：如果您的左侧导航条HTML未在代码中，这里的 margin-left 会导致左侧留白。
-           如果不需要左侧留白，可将 margin-left: 140px 改为 0 */
-        .main-viewport { margin-left: 140px; width: calc(100% - 140px); height: 100vh; position: relative; background: #f0f2f5; }
+        /* === 3. 主视口容器 & 视图切换 === */
+        .main-viewport { width: 100%; height: 100vh; position: relative; background: #f0f2f5; }
         .page-view { display: none; height: 100%; width: 100%; animation: fadeIn 0.2s ease-out; overflow-y: auto; }
         .page-view.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* === 4. 首页 S型地图 & 组件 === */
-        .map-container { position: relative; height: 140px; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; }
-        .map-bg { position: absolute; top: 50%; left: 20px; right: 20px; height: 2px; background: #e0e0e0; z-index: 0; border-top: 2px dashed #ccc; transform: translateY(-50%); }
+        /* === 4. 首页：右侧基础卡片样式 === */
+        .personal-card-bg { background: linear-gradient(135deg, #0284c7 0%, #06b6d4 100%); color: white; }
+        .roam-item { transition: all 0.2s; border: 1px solid transparent; }
+        .roam-item:hover { background: #f0f9ff; border-color: #bae6fd; transform: translateX(2px); }
+
+        /* === 5. 首页：高级组件整合 CSS === */
+        :root {
+            --primary: #2563EB;
+            --primary-glow: rgba(37, 99, 235, 0.5);
+            --cyan: #06B6D4;
+            --purple: #8B5CF6;
+            --dark-bg: #0F172A;
+            --text-sub: #94A3B8;
+        }
+
+        /* 5.1 高级感流体网格 Banner */
+        .hero-banner {
+            position: relative; width: 100%; height: 380px;
+            background-color: var(--dark-bg); border-radius: 12px;
+            overflow: hidden; box-shadow: 0 12px 24px rgba(15, 23, 42, 0.15);
+            display: flex; align-items: center; padding: 0 40px;
+        }
+        .hero-glow-1 { position: absolute; top: -100px; left: -100px; width: 400px; height: 400px; background: radial-gradient(circle, var(--primary) 0%, transparent 60%); opacity: 0.4; filter: blur(80px); animation: float 10s infinite alternate; }
+        .hero-glow-2 { position: absolute; bottom: -150px; right: 10%; width: 500px; height: 500px; background: radial-gradient(circle, var(--purple) 0%, transparent 60%); opacity: 0.3; filter: blur(100px); animation: float 12s infinite alternate-reverse; }
+        .hero-glow-3 { position: absolute; top: 20%; right: -50px; width: 300px; height: 300px; background: radial-gradient(circle, var(--cyan) 0%, transparent 60%); opacity: 0.2; filter: blur(60px); }
+        .hero-grid { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 40px 40px; z-index: 1; }
+        .hero-content { position: relative; z-index: 10; width: 50%; } 
+        .hero-tag { display: inline-flex; align-items: center; gap: 8px; padding: 6px 16px; background: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.3); color: var(--cyan); border-radius: 100px; font-size: 13px; font-weight: 600; margin-bottom: 20px; letter-spacing: 1px; }
+        .hero-title { font-size: 32px; font-weight: 700; color: #FFFFFF; line-height: 1.3; margin-bottom: 16px; background: linear-gradient(135deg, #FFFFFF 0%, #94A3B8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero-desc { font-size: 14px; color: var(--text-sub); line-height: 1.6; margin-bottom: 28px; max-width: 95%; }
         
-        /* 个人卡片渐变 */
-        .personal-card-bg {
-            background: linear-gradient(135deg, #0284c7 0%, #06b6d4 100%);
-            color: white;
+        /* 玻璃拟物数据卡片适配 */
+        .hero-glass-panel {
+            position: absolute; right: 40px; top: 50%; transform: translateY(-50%);
+            z-index: 10; width: 320px; 
+            background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 24px;
+            box-shadow: 0 32px 64px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
         }
-        .glass-btn {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.2s;
-        }
-        .glass-btn:hover { background: rgba(255, 255, 255, 0.25); }
+        .glass-title { color: #FFF; font-size: 16px; font-weight: 600; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+        .glass-data-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .glass-data-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .data-label { color: var(--text-sub); font-size: 13px; }
+        .data-value { color: #FFF; font-size: 18px; font-weight: bold; font-family: 'Courier New', Courier, monospace;}
+        .data-trend { color: #10B981; font-size: 12px; margin-left: 8px; background: rgba(16, 185, 129, 0.1); padding: 2px 6px; border-radius: 4px;}
 
-        /* 漫游组件样式 */
-        .roam-item {
-            transition: all 0.2s;
-            border: 1px solid transparent;
-        }
-        .roam-item:hover {
-            background: #f0f9ff;
-            border-color: #bae6fd;
-            transform: translateX(2px);
-        }
-
-        /* === 5. 成长中心专用样式 (来自第二个文件) === */
-        /* 等级卡片背景 */
-        .level-card-bg {
-            background: linear-gradient(135deg, #0e1c36 0%, #1e3a8a 60%, #1d4ed8 100%);
-            color: white;
-            position: relative;
-            overflow: hidden;
-        }
-        .level-card-bg::after {
-            content: ''; position: absolute; top: -50px; right: -50px;
-            width: 200px; height: 200px; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
-            border-radius: 50%;
-        }
-
-        /* 能量/积分卡片背景 */
-        .energy-card-bg {
-            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); /* orange-500 to orange-600 */
-            color: white;
-            position: relative;
-            overflow: hidden;
-        }
-        /* 背景装饰纹理 - 闪电 */
-        .energy-bg-icon {
-            position: absolute; right: -20px; bottom: -20px; 
-            opacity: 0.1; transform: rotate(-15deg);
-        }
-
-        /* 进度条动画 */
-        .progress-bar { transition: width 1s ease-in-out; }
-
-        /* 任务Tab选中态 */
-        .task-tab.active {
-            color: #0891b2; /* cyan-600 */
-            border-bottom: 2px solid #0891b2;
-            font-weight: bold;
-        }
+        /* 5.2 S型游历地图 (Journey Map) */
+        .journey-section { background: #FFFFFF; border-radius: 12px; padding: 32px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid #f3f4f6; position: relative; }
+        .section-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px; text-align: left; }
+        .section-header h2 { font-size: 24px; font-weight: 700; color: #1E293B; margin-bottom: 8px; }
+        .section-header p { color: #64748B; font-size: 14px; }
         
-        /* 模态框遮罩 */
-        .modal-mask {
-            background-color: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(2px);
-        }
+        .role-switcher { display: flex; background: #F3F4F6; padding: 4px; border-radius: 6px; font-size: 13px; color: #6B7280; border: 1px solid #E5E7EB; }
+        .role-btn { padding: 6px 16px; cursor: pointer; transition: all 0.2s; border-radius: 4px; }
+        .role-btn:hover { color: #0284c7; }
+        .role-btn.active { background: #FFFFFF; color: #0284c7; font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+        .map-container { position: relative; width: 100%; padding: 20px 0; }
+        .map-svg-line { position: absolute; top: 80px; left: 5%; width: 90%; height: 300px; z-index: 0; pointer-events: none; }
+        .map-svg-line path { fill: none; stroke: #E2E8F0; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+        .map-svg-line path.progress-line { stroke: var(--primary); stroke-dasharray: 2000; stroke-dashoffset: 1200; animation: drawLine 3s ease-out forwards; filter: drop-shadow(0 0 8px var(--primary-glow)); }
+        @keyframes drawLine { to { stroke-dashoffset: 800; } }
+
+        .nodes-wrapper { position: relative; z-index: 10; height: 380px; }
+        .map-node { position: absolute; width: 220px; background: #FFFFFF; border-radius: 12px; padding: 16px; box-shadow: 0 8px 24px rgba(148, 163, 184, 0.1); border: 1px solid #E2E8F0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .map-node:hover { transform: translateY(-6px); box-shadow: 0 16px 32px rgba(37, 99, 235, 0.15); border-color: var(--primary); }
+
+        /* 节点分布 */
+        .node-1 { top: 0; left: 0%; }
+        .node-2 { top: 180px; left: 22%; }
+        .node-3 { top: 0; left: 45%; }
+        .node-4 { top: 180px; left: 68%; }
+        .node-5 { top: 0; left: 100%; transform: translateX(-100%); }
+
+        .node-pin { position: absolute; width: 20px; height: 20px; background: #FFFFFF; border: 4px solid #E2E8F0; border-radius: 50%; left: 50%; transform: translateX(-50%); z-index: 20; }
+        .node-1 .node-pin, .node-3 .node-pin, .node-5 .node-pin { bottom: -42px; }
+        .node-2 .node-pin, .node-4 .node-pin { top: -42px; }
+
+        .map-node.completed { border-color: rgba(37, 99, 235, 0.3); }
+        .map-node.completed .node-pin { border-color: var(--primary); background: var(--primary); }
+        .map-node.active { border: 2px solid var(--primary); box-shadow: 0 12px 32px rgba(37, 99, 235, 0.2); }
+        .map-node.active .node-pin { border-color: var(--primary); background: #FFFFFF; box-shadow: 0 0 0 6px rgba(37, 99, 235, 0.2); animation: pulse 2s infinite; }
+        .map-node.locked { opacity: 0.6; background: #F8FAFC; border-style: dashed; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); } 100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); } }
+
+        .node-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+        .node-icon { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+        .completed .node-icon { background: #EFF6FF; color: var(--primary); }
+        .active .node-icon { background: var(--primary); color: #FFF; }
+        .locked .node-icon { background: #E2E8F0; color: #94A3B8; }
+        .node-title { font-size: 14px; font-weight: 600; color: #1E293B; }
+        .node-desc { font-size: 12px; color: #64748B; line-height: 1.5; margin-bottom: 12px; }
+        .node-footer { padding-top: 10px; border-top: 1px solid #F1F5F9; display: flex; justify-content: space-between; align-items: center; }
+        .node-status { font-size: 12px; font-weight: 500; }
+        .completed .node-status { color: #10B981; }
+        .active .node-status { color: var(--primary); }
+        .locked .node-status { color: #94A3B8; }
+
+
+        /* === 6. 个人服务台：专属组件 CSS === */
+        .card { background: #fff; border-radius: 8px; border: 1px solid #e8e8e8; margin-bottom: 20px; overflow: hidden; }
+        .card-header { padding: 16px 24px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; }
+        .card-title { font-size: 16px; font-weight: 600; color: #1f2937; display: flex; align-items: center; gap: 8px; }
+        .card-body { padding: 24px; }
+        
+        /* 折叠控制 */
+        .expand-area { max-height: 0; overflow: hidden; transition: max-height 0.5s ease-in-out, opacity 0.3s ease; opacity: 0; }
+        .expand-area.open { max-height: 3000px; opacity: 1; }
+
+        /* 右侧卡片专属 */
+        .side-card { background: #fff; border-radius: 8px; border: 1px solid #e8e8e8; margin-bottom: 16px; overflow: hidden; }
+
+        /* 签到气泡 */
+        .sign-bubble { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; position: relative; z-index: 10;}
+        .sign-bubble.active { background: #ffedd5; color: #ea580c; border: 1px solid #fdba74; box-shadow: 0 0 8px rgba(253, 186, 116, 0.4);}
+        .sign-bubble.done { background: #f3f4f6; color: #9ca3af; }
+        .sign-bubble.future { background: #fff; color: #d1d5db; border: 1px dashed #d1d5db; }
+        
+        /* 轮播点 */
+        .dot { width: 6px; height: 6px; border-radius: 50%; background: #d1d5db; cursor: pointer; transition: all 0.3s; }
+        .dot.active { width: 16px; background: #3b82f6; border-radius: 4px; }
+        
+        /* Tab样式 */
+        .tab-item { cursor: pointer; padding-bottom: 8px; font-size: 14px; color: #6b7280; border-bottom: 2px solid transparent; transition: all 0.2s; }
+        .tab-item.active { color: #2563eb; font-weight: 600; border-bottom-color: #2563eb; }
+
+        /* 轮播动画 */
+        .carousel-slide { display: none; animation: fadeEffect 0.5s ease-in-out; }
+        .carousel-slide.active { display: flex; }
     </style>
 </head>
 <body>
 
     <div class="main-viewport">
-
+        
         <div id="view-home" class="page-view active">
             <header class="bg-white shadow-sm h-[60px] flex items-center px-8 justify-between sticky top-0 z-40">
                 <div class="flex items-center gap-10">
@@ -130,8 +187,6 @@
                         <a href="#" class="hover:text-cyan-600 h-full flex items-center px-2">帮助中心</a>
                         <a href="#" class="hover:text-cyan-600 h-full flex items-center px-2">AI客服</a>
                         <a href="#" class="hover:text-cyan-600 h-full flex items-center px-2">学习中心</a>
-                        <a href="#" class="hover:text-cyan-600 h-full flex items-center px-2">云声平台</a>
-                        <a href="#" class="hover:text-cyan-600 h-full flex items-center px-2">云筑资讯</a>
                     </nav>
                 </div>
                 <div class="flex items-center gap-4">
@@ -139,60 +194,145 @@
                         <input type="text" placeholder="AI 智能检索..." class="bg-gray-100 rounded-full pl-4 pr-8 py-1.5 text-xs w-56 focus:outline-none focus:ring-2 focus:ring-cyan-500">
                         <i data-lucide="search" class="w-3 h-3 absolute right-3 top-2.5 text-gray-400"></i>
                     </div>
-                    <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center cursor-pointer hover:ring-2 hover:ring-cyan-500 transition" onclick="switchView('energy')">
+                    <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center cursor-pointer hover:bg-gray-300 hover:ring-2 hover:ring-cyan-400 transition" onclick="switchView('personal')">
                         <i data-lucide="user" class="w-4 h-4 text-gray-500"></i>
                     </div>
                 </div>
             </header>
 
             <main class="max-w-[1400px] mx-auto px-6 py-6 flex gap-6">
+                
                 <div class="flex-1 space-y-6">
-                    <div class="relative bg-gradient-to-r from-slate-800 to-slate-900 rounded-xl h-[220px] flex items-center px-12 text-white shadow-lg overflow-hidden">
-                        <div class="z-10 w-2/3 space-y-3">
-                            <span class="bg-white/10 text-cyan-300 text-xs px-2 py-1 rounded border border-white/20">2026 新规升级</span>
-                            <h1 class="text-3xl font-bold tracking-tight">范围更广 流程更快 业务更优</h1>
-                            <p class="opacity-80 text-sm font-light">绿色供方库入驻规则全面升级，助力企业降本增效。</p>
-                            <button class="bg-cyan-600 text-white px-5 py-2 rounded-full text-xs font-bold hover:bg-cyan-500 shadow-lg mt-2">立即查看</button>
+                    
+                    <div class="hero-banner">
+                        <div class="hero-glow-1"></div>
+                        <div class="hero-glow-2"></div>
+                        <div class="hero-glow-3"></div>
+                        <div class="hero-grid"></div>
+                        
+                        <div class="hero-content">
+                            <div class="hero-tag"><i class="fas fa-rocket"></i> 云筑服务筑能站 · 全新启航</div>
+                            <h1 class="hero-title">筑基赋能，构筑企业成长新生态</h1>
+                            <p class="hero-desc">聚合平台核心服务资源，打造一站式学习与操作指引体系。全面提升用户平台实操技能，助力企业降本增效，加速业务流数字化转型。</p>
+                            <div style="display: flex; gap: 12px;">
+                                <button style="background: var(--primary); color: white; border: none; padding: 10px 24px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;">开始学习</button>
+                                <button style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(4px); padding: 10px 24px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;">浏览全部课程</button>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="bg-white rounded-xl shadow-sm p-6 relative overflow-hidden border border-gray-100">
-                        <div class="flex justify-between items-center mb-8">
-                            <h3 class="font-bold text-lg text-gray-800 border-l-4 border-cyan-500 pl-3">岗位能力成长路径</h3>
-                            <div class="flex bg-gray-100 p-1 rounded text-xs text-gray-500">
-                                <span class="px-3 py-1 cursor-pointer">财务人员</span>
-                                <span class="px-3 py-1 bg-white text-cyan-700 shadow-sm rounded font-bold">系统管理员</span>
-                                <span class="px-3 py-1 cursor-pointer">业务人员</span>
-                            </div>
-                        </div>
-                        <div class="map-container">
-                            <div class="map-bg"></div>
-                            <div class="relative z-10 flex flex-col items-center gap-2 cursor-pointer group" onclick="alert('进入课程')">
-                                <div class="w-12 h-12 rounded-full bg-cyan-500 text-white flex items-center justify-center border-4 border-white shadow-md group-hover:scale-110 transition"><i data-lucide="check" class="w-5 h-5"></i></div>
-                                <span class="text-xs font-bold bg-white px-2 py-1 rounded shadow-sm">苍穹初始</span>
-                            </div>
-                            <div class="relative z-10 flex flex-col items-center gap-2 cursor-pointer group" onclick="alert('进入课程')">
-                                <div class="w-12 h-12 rounded-full bg-cyan-500 text-white flex items-center justify-center border-4 border-white shadow-md group-hover:scale-110 transition"><i data-lucide="check" class="w-5 h-5"></i></div>
-                                <span class="text-xs font-bold bg-white px-2 py-1 rounded shadow-sm">页面建模</span>
-                            </div>
-                            <div class="relative z-10 flex flex-col items-center gap-2 cursor-pointer group" onclick="alert('进入课程')">
-                                <div class="w-14 h-14 rounded-full bg-white text-cyan-600 flex items-center justify-center border-4 border-cyan-500 shadow-lg relative group-hover:scale-110 transition">
-                                    <i data-lucide="play" class="w-6 h-6 ml-1 fill-cyan-600"></i>
-                                    <span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>
+                        <div class="hero-glass-panel">
+                            <div class="glass-title"><i class="fas fa-chart-line"></i> 筑能数据总览</div>
+                            <div class="glass-data-item">
+                                <span class="data-label">体系化课程覆盖</span>
+                                <div>
+                                    <span class="data-value">120+</span>
+                                    <span class="data-trend"><i class="fas fa-arrow-up"></i> 持续更新</span>
                                 </div>
-                                <span class="text-xs font-bold text-white bg-cyan-600 px-3 py-1 rounded shadow-md">控件入门</span>
                             </div>
-                            <div class="relative z-10 flex flex-col items-center gap-2 opacity-50 grayscale">
-                                <div class="w-10 h-10 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center border-4 border-white shadow-sm"><i data-lucide="lock" class="w-4 h-4"></i></div>
-                                <span class="text-xs text-gray-500">基础服务</span>
+                            <div class="glass-data-item">
+                                <span class="data-label">标准业务指引</span>
+                                <div>
+                                    <span class="data-value">500+</span>
+                                    <span class="data-trend"><i class="fas fa-arrow-up"></i> 全流程覆盖</span>
+                                </div>
                             </div>
-                            <div class="relative z-10 flex flex-col items-center gap-2 opacity-50 grayscale">
-                                <div class="w-10 h-10 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center border-4 border-white shadow-sm"><i data-lucide="award" class="w-4 h-4"></i></div>
-                                <span class="text-xs text-gray-500">能力认证</span>
+                            <div class="glass-data-item">
+                                <span class="data-label">服务响应速率</span>
+                                <div>
+                                    <span class="data-value">0.5h</span>
+                                    <span class="data-trend" style="background: rgba(59, 130, 246, 0.1); color: #3B82F6;"><i class="fas fa-bolt"></i> 极速</span>
+                                </div>
                             </div>
                         </div>
                     </div>
 
+                    <div class="journey-section">
+                        <div class="section-header">
+                            <div>
+                                <h2>岗位能力成长路径</h2>
+                                <p>量身定制进阶路线，全链路赋能业务成长与系统管理。</p>
+                            </div>
+                            <div class="role-switcher">
+                                <div class="role-btn">财务人员</div>
+                                <div class="role-btn active">系统管理员</div>
+                                <div class="role-btn">业务人员</div>
+                            </div>
+                        </div>
+
+                        <div class="map-container">
+                            <svg class="map-svg-line" viewBox="0 0 1000 240" preserveAspectRatio="none">
+                                <path d="M 120 40 C 300 40, 300 200, 500 200 C 700 200, 700 40, 880 40" />
+                                <path class="progress-line" d="M 120 40 C 300 40, 300 200, 500 200 C 700 200, 700 40, 880 40" />
+                            </svg>
+
+                            <div class="nodes-wrapper">
+                                <div class="map-node completed node-1">
+                                    <div class="node-pin"></div>
+                                    <div class="node-header">
+                                        <div class="node-icon"><i class="fas fa-database"></i></div>
+                                        <div class="node-title">基础应用入门</div>
+                                    </div>
+                                    <div class="node-desc">熟悉云筑账号体系与基础权限配置，掌握工作台核心操作规范。</div>
+                                    <div class="node-footer">
+                                        <span class="node-status"><i class="fas fa-check-circle"></i> 已学习</span>
+                                        <span style="font-size: 11px; color: #94A3B8;">里程碑 1</span>
+                                    </div>
+                                </div>
+
+                                <div class="map-node completed node-2">
+                                    <div class="node-pin"></div>
+                                    <div class="node-header">
+                                        <div class="node-icon"><i class="fas fa-shield-halved"></i></div>
+                                        <div class="node-title">核心业务建模</div>
+                                    </div>
+                                    <div class="node-desc">掌握企业组织架构搭建，完成采购、招投标等基础业务流配置。</div>
+                                    <div class="node-footer">
+                                        <span class="node-status"><i class="fas fa-check-circle"></i> 已学习</span>
+                                        <span style="font-size: 11px; color: #94A3B8;">里程碑 2</span>
+                                    </div>
+                                </div>
+
+                                <div class="map-node active node-3">
+                                    <div class="node-pin"></div>
+                                    <div class="node-header">
+                                        <div class="node-icon"><i class="fas fa-filter"></i></div>
+                                        <div class="node-title">高级控件实操</div>
+                                    </div>
+                                    <div class="node-desc">深入学习表单控件高级属性，利用灵活的规则引擎实现复杂流转。</div>
+                                    <div class="node-footer">
+                                        <span class="node-status"><i class="fas fa-spinner fa-spin"></i> 学习中</span>
+                                        <button style="background: #EFF6FF; color: var(--primary); border: none; padding: 4px 10px; border-radius: 4px; font-size: 12px; cursor: pointer;">继续学习</button>
+                                    </div>
+                                </div>
+
+                                <div class="map-node locked node-4">
+                                    <div class="node-pin"></div>
+                                    <div class="node-header">
+                                        <div class="node-icon"><i class="fas fa-network-wired"></i></div>
+                                        <div class="node-title">开放平台对接</div>
+                                    </div>
+                                    <div class="node-desc">了解云筑 OpenAPI 规范，探索内部 ERP 系统与云筑网的数据互联。</div>
+                                    <div class="node-footer">
+                                        <span class="node-status"><i class="fas fa-lock"></i> 待解锁</span>
+                                        <span style="font-size: 11px; color: #94A3B8;">进阶课程</span>
+                                    </div>
+                                </div>
+
+                                <div class="map-node locked node-5">
+                                    <div class="node-pin"></div>
+                                    <div class="node-header">
+                                        <div class="node-icon"><i class="fas fa-chart-pie"></i></div>
+                                        <div class="node-title">数智化驾驶舱</div>
+                                    </div>
+                                    <div class="node-desc">运用数据看板进行采购行为分析，沉淀数据资产，赋能科学决策。</div>
+                                    <div class="node-footer">
+                                        <span class="node-status"><i class="fas fa-lock"></i> 待解锁</span>
+                                        <span style="font-size: 11px; color: #94A3B8;">高阶课程</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div>
                         <div class="flex justify-between items-end mb-4">
                             <h3 class="font-bold text-lg text-gray-800">精品专题 <span class="text-xs font-normal text-gray-400 ml-2">专家深度讲解</span></h3>
@@ -320,28 +460,25 @@
                 </div>
 
                 <div class="w-[280px] flex-shrink-0 space-y-4">
-                    
                     <div class="personal-card-bg rounded-xl shadow-lg p-5 relative overflow-hidden">
                         <div class="absolute -right-4 -top-4 w-24 h-24 bg-white opacity-10 rounded-full blur-xl"></div>
                         <div class="absolute -left-4 bottom-0 w-32 h-32 bg-cyan-300 opacity-10 rounded-full blur-xl"></div>
                         
                         <div class="relative z-10 flex items-center gap-3 mb-5">
-                             <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center border-2 border-white/30 backdrop-blur-sm cursor-pointer hover:bg-white/30 transition" onclick="switchView('energy')">
+                             <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center border-2 border-white/30 backdrop-blur-sm cursor-pointer hover:bg-white/30 hover:scale-105 transition" onclick="switchView('personal')">
                                 <i data-lucide="user" class="w-6 h-6 text-white"></i>
                             </div>
                             <div>
-                                <div class="font-bold text-base text-white">老王</div>
-                                <div class="text-[10px] text-white/80 bg-black/10 inline-block px-1.5 py-0.5 rounded mt-0.5">云筑网已陪伴您 2321 天</div>
+                                <div class="font-bold text-base text-white">产品经理老王</div>
+                                <div class="text-[10px] text-white/80 bg-black/10 inline-block px-1.5 py-0.5 rounded mt-0.5">筑能已陪伴您 2321 天</div>
                             </div>
                         </div>
 
                         <div class="relative z-10 mb-6">
-                            <div class="flex items-center gap-1 text-white/80 text-xs mb-1">
-                                <span>当前积分</span>
-                            </div>
+                            <div class="flex items-center gap-1 text-white/80 text-xs mb-1"><span>当前筑能值</span></div>
                             <div class="flex items-baseline justify-between">
                                 <span class="text-3xl font-black font-num text-white tracking-wide">2,450</span>
-                                <div class="text-[10px] text-white/70">击败了 85% 的用户</div>
+                                <div class="text-[10px] text-white/70">击败了全国 85% 的筑友</div>
                             </div>
                             <div class="w-full h-1.5 bg-black/10 rounded-full mt-2 overflow-hidden">
                                 <div class="h-full bg-cyan-200 w-[70%]"></div>
@@ -404,7 +541,6 @@
                             <span class="text-[10px] text-blue-400 bg-white px-1.5 py-0.5 rounded border border-blue-100">Hot</span>
                         </div>
                         <div class="space-y-2">
-
                             <div class="bg-white rounded-lg p-2.5 flex items-center gap-3 cursor-pointer roam-item shadow-sm" onclick="alert('即将播放：3分钟玩转筑能站视频')">
                                 <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center"><i data-lucide="play-circle" class="w-4 h-4"></i></div>
                                 <div class="flex-1">
@@ -423,7 +559,6 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
             </main>
             
@@ -433,362 +568,623 @@
             </div>
         </div>
 
-        <div id="view-energy" class="page-view bg-[#f0f2f5]">
-            <header class="bg-white shadow-sm h-[60px] flex items-center px-8 justify-between sticky top-0 z-40">
-                <div class="flex items-center gap-2 cursor-pointer" onclick="switchView('home')">
-                    <i data-lucide="arrow-left" class="w-5 h-5 text-gray-500 hover:text-cyan-600"></i>
-                    <span class="text-lg font-bold text-gray-800">成长中心</span>
-                    <span class="text-xs text-gray-500 border-l pl-3 ml-3 border-gray-300">记录您的每一次进步</span>
+
+        <div id="view-personal" class="page-view bg-[#f0f2f5] pb-20">
+            <header class="bg-white shadow-sm h-16 flex items-center px-8 justify-between sticky top-0 z-40">
+                <div class="flex items-center gap-6">
+                    <div class="cursor-pointer flex items-center gap-2 text-gray-500 hover:text-blue-600 transition font-bold mr-2" onclick="switchView('home')">
+                        <i data-lucide="arrow-left" class="w-5 h-5"></i> 返回
+                    </div>
+                    
+                    <div class="w-8 h-8 bg-blue-600 rounded text-white flex items-center justify-center font-bold italic">Y</div>
+                    <span class="text-lg font-bold text-gray-800">云筑网 <span class="text-xs font-normal text-gray-500 ml-2">服务筑能站</span></span>
+                    <nav class="hidden md:flex space-x-6 text-sm font-medium text-gray-600 ml-6">
+                        <a href="#" class="text-blue-600 font-bold border-b-2 border-blue-600 h-16 leading-[4rem]">个人服务台</a>
+                    </nav>
                 </div>
-                <div class="flex items-center gap-4">
-                    <div class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center border border-gray-200">
-                        <i data-lucide="user" class="w-4 h-4 text-gray-500"></i>
+                <div class="flex items-center gap-5">
+                    <div class="relative">
+                        <input type="text" placeholder="AI 智能检索..." class="bg-gray-100 rounded-full pl-8 pr-4 py-1.5 text-xs w-56 focus:outline-none focus:ring-2 focus:ring-blue-500/50">
+                        <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-2 text-gray-400"></i>
+                    </div>
+                    <div class="relative cursor-pointer hover:text-blue-600 transition">
+                        <i data-lucide="bell" class="w-5 h-5 text-gray-600"></i>
+                        <span class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white"></span>
                     </div>
                 </div>
             </header>
 
-            <main class="max-w-[1200px] mx-auto p-6 space-y-6">
-
-                <div class="grid grid-cols-12 gap-6">
+            <main class="max-w-[1200px] mx-auto px-6 py-6 flex gap-6">
+                
+                <div class="flex-1 min-w-0">
                     
-                    <div class="col-span-8 level-card-bg rounded-xl p-8 shadow-lg flex flex-col justify-between h-[200px]">
-                        <div class="flex justify-between items-start z-10">
+                    <div class="flex justify-between items-center mb-6">
+                        <h1 class="text-2xl font-bold text-gray-800">个人服务台</h1>
+                        <button class="text-sm text-blue-600 flex items-center gap-1 hover:bg-blue-50 px-2 py-1 rounded transition">
+                            <i data-lucide="arrow-left-right" class="w-4 h-4"></i> 切换岗位
+                        </button>
+                    </div>
+
+                    <div class="relative bg-gradient-to-r from-blue-600 to-cyan-500 rounded-xl p-4 text-white mb-6 shadow-md overflow-hidden">
+                        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+                        <div class="carousel-slide active items-center justify-between relative z-10" id="banner-1">
                             <div class="flex items-center gap-4">
-                                <div class="w-16 h-16 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center border-2 border-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.3)]">
-                                    <i data-lucide="crown" class="w-8 h-8 text-yellow-400 fill-yellow-400"></i>
+                                <div class="bg-white/20 p-3 rounded-xl backdrop-blur-sm shadow-inner"><i data-lucide="award" class="w-6 h-6 text-yellow-300"></i></div>
+                                <div>
+                                    <div class="font-bold text-lg tracking-wide">您有 <span class="text-yellow-300 text-xl mx-1">1500</span> 积分待入账！</div>
+                                    <div class="text-xs opacity-90 mt-1">再完成 1 个日常任务即可获取更多权益，加速解锁专属提效工具。</div>
                                 </div>
+                            </div>
+                            <button class="bg-white text-blue-600 px-5 py-2 rounded-full text-sm font-bold shadow hover:bg-blue-50 transition transform hover:scale-105">立即前往</button>
+                        </div>
+                    </div>
+
+                    <div class="card border-blue-100 shadow-sm">
+                        <div class="card-header pt-5">
+                            <div class="card-title text-blue-800"><i data-lucide="target" class="w-5 h-5 text-blue-600"></i> 筑能挑战</div>
+                        </div>
+                        <div class="card-body pt-2 pb-4">
+                            
+                            <div class="space-y-4 mb-2">
+                                <div class="bg-blue-50/50 p-4 rounded-lg border border-blue-100">
+                                    <div class="text-xs font-bold text-blue-800 mb-4 flex justify-between">
+                                        <span>快速入门 · 岗位学习地图</span>
+                                        <span class="text-blue-500 font-num">进度: 1/4</span>
+                                    </div>
+                                    <div class="flex justify-between relative px-6 mb-2">
+                                        <div class="absolute top-4 left-10 right-10 h-[2px] bg-gray-200 z-0"></div>
+                                        <div class="absolute top-4 left-10 w-[28%] h-[2px] bg-blue-500 z-0"></div>
+                                        
+                                        <div class="relative z-10 flex flex-col items-center gap-2">
+                                            <div class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center ring-4 ring-blue-50 shadow"><i data-lucide="check" class="w-4 h-4"></i></div>
+                                            <span class="text-[10px] text-gray-500 font-bold">苍穹初始</span>
+                                        </div>
+                                        <div class="relative z-10 flex flex-col items-center gap-2">
+                                            <div class="w-8 h-8 rounded-full bg-white border-2 border-blue-500 text-blue-600 flex items-center justify-center ring-4 ring-blue-50 shadow"><i data-lucide="play" class="w-3 h-3 ml-0.5"></i></div>
+                                            <span class="text-[10px] font-bold text-blue-700">页面建模</span>
+                                        </div>
+                                        <div class="relative z-10 flex flex-col items-center gap-2 opacity-50">
+                                            <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center ring-4 ring-gray-50"><i data-lucide="lock" class="w-3 h-3"></i></div>
+                                            <span class="text-[10px] text-gray-400">控件入门</span>
+                                        </div>
+                                        <div class="relative z-10 flex flex-col items-center gap-2 opacity-50">
+                                            <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center ring-4 ring-gray-50"><i data-lucide="award" class="w-4 h-4"></i></div>
+                                            <span class="text-[10px] text-gray-400">能力认证</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center justify-between p-3 bg-orange-50/50 rounded-lg border border-orange-200">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-10 h-10 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center border border-white"><i data-lucide="users" class="w-5 h-5"></i></div>
+                                        <div>
+                                            <div class="font-bold text-sm text-gray-800 flex items-center gap-2">邀请企业入驻 <span class="bg-red-100 text-red-600 text-[10px] px-1.5 rounded">限时高额</span></div>
+                                            <div class="text-xs text-gray-500 mt-0.5">成功邀请 1 家企业完成认证，同享大礼。</div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-4">
+                                        <span class="text-red-500 font-bold font-num text-sm">+500 积分</span>
+                                        <button class="bg-gradient-to-r from-orange-400 to-orange-500 text-white px-4 py-1.5 rounded text-xs font-bold shadow-md hover:opacity-90">去邀请</button>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded flex items-center justify-center"><i data-lucide="book-open" class="w-5 h-5"></i></div>
+                                        <div>
+                                            <div class="font-bold text-sm text-gray-800">主线：完成《页面建模》课程学习</div>
+                                            <div class="text-xs text-gray-500 mt-0.5">当前进度 0/1</div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-4">
+                                        <span class="text-orange-500 font-bold font-num text-sm">+50 积分</span>
+                                        <button class="bg-blue-600 text-white px-4 py-1.5 rounded text-xs font-bold shadow-sm hover:bg-blue-700">去学习</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="more-tasks" class="expand-area mt-4 border-t border-dashed border-gray-200 pt-4">
+                                <div class="flex gap-6 mb-4">
+                                    <div class="tab-item active">岗位任务 (5)</div>
+                                    <div class="tab-item">活动任务 (6)</div>
+                                    <div class="tab-item">其他任务 (2)</div>
+                                </div>
+                                <div class="space-y-3">
+                                    <div class="flex items-center justify-between p-3 bg-green-50/30 rounded-lg border border-green-200">
+                                        <div class="flex items-center gap-4">
+                                            <div class="w-10 h-10 bg-green-100 text-green-600 rounded flex items-center justify-center"><i data-lucide="message-square" class="w-5 h-5"></i></div>
+                                            <div><div class="font-bold text-sm text-gray-800">提交一条云声建议</div><div class="text-[10px] text-green-600 font-bold">任务已完成，奖励待领取</div></div>
+                                        </div>
+                                        <div class="flex items-center gap-4"><span class="text-orange-500 font-bold font-num text-sm">+20 积分</span><button class="bg-gradient-to-r from-orange-400 to-orange-500 text-white px-4 py-1.5 rounded text-xs font-bold shadow-md animate-pulse">领取奖励</button></div>
+                                    </div>
+                                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100 hover:border-blue-200 transition">
+                                        <div class="flex items-center gap-4">
+                                            <div class="w-10 h-10 bg-purple-100 text-purple-600 rounded flex items-center justify-center"><i data-lucide="share-2" class="w-5 h-5"></i></div>
+                                            <div><div class="font-bold text-sm text-gray-800">分享任意页面至外部</div><div class="text-xs text-gray-500">每日限 1 次</div></div>
+                                        </div>
+                                        <div class="flex items-center gap-4"><span class="text-orange-500 font-bold font-num text-sm">+10 积分</span><button class="bg-white border border-gray-300 text-gray-600 px-4 py-1.5 rounded text-xs font-bold hover:text-blue-600 hover:border-blue-600">去分享</button></div>
+                                    </div>
+                                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100 hover:border-blue-200 transition">
+                                        <div class="flex items-center gap-4">
+                                            <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded flex items-center justify-center"><i data-lucide="file-edit" class="w-5 h-5"></i></div>
+                                            <div><div class="font-bold text-sm text-gray-800">发表精华文章</div><div class="text-xs text-gray-500">文章被评为精华即可获得</div></div>
+                                        </div>
+                                        <div class="flex items-center gap-4"><span class="text-orange-500 font-bold font-num text-sm">+100 积分</span><button class="bg-white border border-gray-300 text-gray-600 px-4 py-1.5 rounded text-xs font-bold hover:text-blue-600 hover:border-blue-600">去发布</button></div>
+                                    </div>
+                                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100 hover:border-blue-200 transition">
+                                        <div class="flex items-center gap-4">
+                                            <div class="w-10 h-10 bg-teal-100 text-teal-600 rounded flex items-center justify-center"><i data-lucide="check-square" class="w-5 h-5"></i></div>
+                                            <div><div class="font-bold text-sm text-gray-800">完善企业基本信息</div><div class="text-xs text-gray-500">一次性任务</div></div>
+                                        </div>
+                                        <div class="flex items-center gap-4"><span class="text-orange-500 font-bold font-num text-sm">+30 积分</span><button class="bg-white border border-gray-300 text-gray-600 px-4 py-1.5 rounded text-xs font-bold hover:text-blue-600 hover:border-blue-600">去完善</button></div>
+                                    </div>
+                                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100 opacity-60">
+                                        <div class="flex items-center gap-4">
+                                            <div class="w-10 h-10 bg-gray-200 text-gray-500 rounded flex items-center justify-center"><i data-lucide="log-in" class="w-5 h-5"></i></div>
+                                            <div><div class="font-bold text-sm text-gray-800">每日登录打卡</div><div class="text-[10px] text-gray-500">今日已完成</div></div>
+                                        </div>
+                                        <div class="flex items-center gap-4"><span class="text-gray-400 font-bold font-num text-sm">+5 积分</span><button class="bg-gray-100 border border-transparent text-gray-400 px-4 py-1.5 rounded text-xs font-bold cursor-not-allowed">已领取</button></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="text-center mt-3">
+                                <button id="btn-toggle-tasks" class="text-xs text-blue-500 flex items-center justify-center gap-1 mx-auto hover:underline bg-blue-50 px-3 py-1 rounded-full">
+                                    <span>展开全部挑战 (12)</span> <i data-lucide="chevron-down" class="w-3 h-3 transition-transform duration-300" id="icon-task-chevron"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header cursor-pointer select-none toggle-btn" data-target="#learn-body">
+                            <div class="card-title"><i data-lucide="history" class="w-5 h-5 text-green-500"></i> 学习记录</div>
+                            <div class="flex items-center gap-2 text-sm text-gray-500">
+                                <i data-lucide="chevron-up" class="w-4 h-4 transform transition-transform duration-300 icon-chevron"></i>
+                            </div>
+                        </div>
+                        <div class="card-body" id="learn-body">
+                            
+                            <div class="grid grid-cols-5 gap-4 mb-6">
+                                <div class="col-span-1 bg-blue-50/50 border border-blue-100 rounded-lg p-3 flex flex-col justify-center items-center relative overflow-hidden">
+                                    <div class="text-xs text-gray-500 mb-1">累计学习时长</div>
+                                    <div class="text-2xl font-bold text-blue-600 font-num">45.5<span class="text-xs font-normal text-gray-500 ml-1">h</span></div>
+                                </div>
+                                <div class="col-span-1 bg-green-50/50 border border-green-100 rounded-lg p-3 flex flex-col justify-center items-center relative overflow-hidden">
+                                    <div class="text-xs text-gray-500 mb-1">本周学习时长</div>
+                                    <div class="text-2xl font-bold text-green-600 font-num">3.2<span class="text-xs font-normal text-gray-500 ml-1">h</span></div>
+                                </div>
+                                <div class="col-span-1 bg-purple-50/50 border border-purple-100 rounded-lg p-3 flex flex-col justify-center items-center relative overflow-hidden">
+                                    <div class="text-xs text-gray-500 mb-1">学习时长排名</div>
+                                    <div class="text-2xl font-bold text-purple-600 font-num">Top 3</div>
+                                </div>
+                                <div class="col-span-2 border border-gray-100 shadow-sm rounded-lg p-3">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="font-bold text-xs text-gray-700">学习打卡日历</span>
+                                        <i data-lucide="calendar" class="w-3.5 h-3.5 text-gray-400"></i>
+                                    </div>
+                                    <div class="grid grid-cols-7 gap-1 text-center text-[10px] text-gray-400 font-num">
+                                        <div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div><div>日</div>
+                                        <div class="p-1 rounded bg-green-100 text-green-600 font-bold">1</div>
+                                        <div class="p-1 rounded bg-green-100 text-green-600 font-bold">2</div>
+                                        <div class="p-1 rounded bg-gray-50">3</div>
+                                        <div class="p-1 rounded bg-green-100 text-green-600 font-bold">4</div>
+                                        <div class="p-1 rounded bg-green-100 text-green-600 font-bold">5</div>
+                                        <div class="p-1 rounded bg-green-500 text-white font-bold ring-2 ring-green-200 shadow-sm">6</div>
+                                        <div class="p-1">7</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="font-bold text-sm mb-3 text-gray-800 border-l-4 border-blue-500 pl-2">正在学习</div>
+                            <div class="space-y-3 mb-2">
+                                <div class="flex items-center gap-4 group p-2 hover:bg-gray-50 rounded transition border border-transparent hover:border-gray-200">
+                                    <div class="w-24 h-14 bg-gray-200 rounded flex-shrink-0 bg-[url('https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=200')] bg-cover bg-center"></div>
+                                    <div class="flex-1">
+                                        <div class="flex justify-between text-sm mb-1.5">
+                                            <span class="font-medium text-gray-800 cursor-pointer group-hover:text-blue-600 transition">建筑供应链数字化转型必修课</span>
+                                            <span class="text-blue-600 font-bold font-num text-xs">75%</span>
+                                        </div>
+                                        <div class="w-full bg-gray-100 rounded-full h-1.5 mb-1.5"><div class="bg-blue-500 h-1.5 rounded-full" style="width: 75%"></div></div>
+                                        <div class="text-[10px] text-gray-400">上次学到：第三章 供应链协同</div>
+                                    </div>
+                                    <button class="border border-blue-500 text-blue-600 px-3 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition hover:bg-blue-50">继续</button>
+                                </div>
+                                <div class="flex items-center gap-4 group p-2 hover:bg-gray-50 rounded transition border border-transparent hover:border-gray-200">
+                                    <div class="w-24 h-14 bg-gray-200 rounded flex-shrink-0 bg-[url('https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=200')] bg-cover bg-center"></div>
+                                    <div class="flex-1">
+                                        <div class="flex justify-between text-sm mb-1.5">
+                                            <span class="font-medium text-gray-800 cursor-pointer group-hover:text-blue-600 transition">采购商务谈判技巧进阶</span>
+                                            <span class="text-blue-600 font-bold font-num text-xs">30%</span>
+                                        </div>
+                                        <div class="w-full bg-gray-100 rounded-full h-1.5 mb-1.5"><div class="bg-blue-500 h-1.5 rounded-full" style="width: 30%"></div></div>
+                                        <div class="text-[10px] text-gray-400">上次学到：第一章 准备工作</div>
+                                    </div>
+                                    <button class="border border-blue-500 text-blue-600 px-3 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition hover:bg-blue-50">继续</button>
+                                </div>
+                            </div>
+
+                            <div id="more-learning" class="expand-area mt-4 border-t border-dashed border-gray-200 pt-4">
+                                <div class="flex gap-4 mb-4 border-b border-gray-100">
+                                    <div class="tab-item active">已学完 (15)</div>
+                                    <div class="tab-item">待学习 (1)</div>
+                                </div>
+                                <div class="space-y-3">
+                                    <div class="flex items-center justify-between text-sm text-gray-600 hover:bg-gray-50 p-2 rounded cursor-pointer">
+                                        <span class="truncate pr-2">《电子招投标操作指南》</span>
+                                        <span class="text-green-500 text-xs shrink-0"><i data-lucide="check-circle" class="w-3 h-3 inline"></i> 100%</span>
+                                    </div>
+                                    <div class="flex items-center justify-between text-sm text-gray-600 hover:bg-gray-50 p-2 rounded cursor-pointer">
+                                        <span class="truncate pr-2">《供应商入驻避坑指南》</span>
+                                        <span class="text-green-500 text-xs shrink-0"><i data-lucide="check-circle" class="w-3 h-3 inline"></i> 100%</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="text-center mt-3 pt-2">
+                                <button id="btn-toggle-learn" class="text-xs text-gray-500 flex items-center justify-center gap-1 mx-auto hover:text-blue-600 transition">
+                                    <span>展开更多学习详情</span> <i data-lucide="chevron-down" class="w-3 h-3 transition-transform duration-300" id="icon-learn-chevron"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title"><i data-lucide="medal" class="w-5 h-5 text-orange-500"></i> 获得成就</div>
+                            <div class="text-xs text-gray-500 cursor-pointer hover:text-blue-600">已点亮 3 枚 ></div>
+                        </div>
+                        <div class="card-body grid grid-cols-5 gap-4 text-center pt-2 pb-6">
+                            <div class="flex flex-col items-center">
+                                <div class="w-14 h-14 rounded-full bg-orange-100 border-2 border-orange-300 flex items-center justify-center mb-2"><i data-lucide="flame" class="w-7 h-7 text-orange-500"></i></div>
+                                <div class="text-xs font-bold text-gray-800">打卡达人</div>
+                            </div>
+                            <div class="flex flex-col items-center">
+                                <div class="w-14 h-14 rounded-full bg-blue-100 border-2 border-blue-300 flex items-center justify-center mb-2"><i data-lucide="book" class="w-7 h-7 text-blue-500"></i></div>
+                                <div class="text-xs font-bold text-gray-800">勤学标兵</div>
+                            </div>
+                            <div class="flex flex-col items-center">
+                                <div class="w-14 h-14 rounded-full bg-yellow-100 border-2 border-yellow-400 flex items-center justify-center mb-2"><i data-lucide="star" class="w-7 h-7 text-yellow-500"></i></div>
+                                <div class="text-xs font-bold text-gray-800">满分学员</div>
+                            </div>
+                            <div class="flex flex-col items-center opacity-40 grayscale">
+                                <div class="w-14 h-14 rounded-full bg-gray-100 border-2 border-gray-300 flex items-center justify-center mb-2"><i data-lucide="message-circle" class="w-7 h-7 text-gray-400"></i></div>
+                                <div class="text-xs font-bold text-gray-600">首评达人</div>
+                            </div>
+                            <div class="flex flex-col items-center opacity-40 grayscale">
+                                <div class="w-14 h-14 rounded-full bg-gray-100 border-2 border-gray-300 flex items-center justify-center mb-2"><i data-lucide="thumbs-up" class="w-7 h-7 text-gray-400"></i></div>
+                                <div class="text-xs font-bold text-gray-600">反馈先锋</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header border-b-0 pb-2">
+                            <div class="card-title"><i data-lucide="headphones" class="w-5 h-5 text-purple-500"></i> 服务进度</div>
+                        </div>
+                        <div class="card-body pt-0 bg-gray-50/30 p-6">
+                            
+                            <div class="grid grid-cols-2 gap-4 mb-4">
+                                <div class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition flex flex-col justify-between">
+                                    <div class="flex justify-between items-center mb-3">
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-7 h-7 rounded bg-orange-50 text-orange-500 flex items-center justify-center"><i data-lucide="message-square" class="w-4 h-4"></i></div>
+                                            <span class="font-bold text-sm text-gray-800">云声建议</span>
+                                        </div>
+                                        <span class="text-xs text-gray-400 cursor-pointer hover:text-orange-500">查看全部 ></span>
+                                    </div>
+                                    <div>
+                                        <div class="font-medium text-gray-700 text-sm mb-1.5 truncate">建议优化询价单批量发布流程</div>
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-xs text-gray-400 font-num">更新于: 昨天 14:00</span>
+                                            <span class="text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded">已采纳</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition flex flex-col justify-between">
+                                    <div class="flex justify-between items-center mb-3">
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-7 h-7 rounded bg-purple-50 text-purple-500 flex items-center justify-center"><i data-lucide="message-circle" class="w-4 h-4"></i></div>
+                                            <span class="font-bold text-sm text-gray-800">内容/课程反馈</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col items-center justify-center py-1">
+                                        <span class="text-xs text-gray-500 mb-2">暂无反馈记录，留下您的宝贵建议吧</span>
+                                        <button class="text-xs border border-blue-500 text-blue-600 px-3 py-1 rounded hover:bg-blue-50 transition">去提建议</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-white border border-gray-200 rounded-lg p-4">
+                                <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-3">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-7 h-7 rounded bg-blue-50 text-blue-500 flex items-center justify-center"><i data-lucide="file-text" class="w-4 h-4"></i></div>
+                                        <span class="font-bold text-sm text-gray-800">工单进度</span>
+                                    </div>
+                                    <span class="text-xs text-gray-400 cursor-pointer hover:text-blue-500">查看全部 (5) ></span>
+                                </div>
+                                
+                                <div class="space-y-3">
+                                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100 hover:border-blue-200 transition">
+                                        <div class="flex items-center gap-4 w-1/2">
+                                            <div class="min-w-0 w-full">
+                                                <div class="font-bold text-sm text-gray-800 truncate cursor-pointer hover:text-blue-600">关于企业实名认证失败的原因咨询</div>
+                                                <div class="text-xs text-gray-500 mt-1 flex gap-4">
+                                                    <span class="font-num text-gray-400">工单号: W-10082</span>
+                                                    <span class="font-num">提交时间: 2026-03-09</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center justify-end gap-6 w-1/2">
+                                            <div class="text-right">
+                                                <div class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded inline-block mb-1 border border-blue-100">处理中</div>
+                                            </div>
+                                            <div class="flex gap-2 shrink-0">
+                                                <button class="bg-white border border-gray-300 text-gray-600 px-3 py-1.5 rounded text-xs hover:border-blue-500 hover:text-blue-500 transition">预计最晚处理: 明日 18:00</button>
+                                                <button class="bg-blue-50 border border-blue-100 text-blue-600 px-3 py-1.5 rounded text-xs font-bold hover:bg-blue-100 transition">查看详情</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100 opacity-70">
+                                        <div class="flex items-center gap-4 w-1/2">
+                                            <div class="min-w-0 w-full">
+                                                <div class="font-bold text-sm text-gray-800 truncate">年度平台服务费电子发票开具申请进度</div>
+                                                <div class="text-xs text-gray-500 mt-1 flex gap-4">
+                                                    <span class="font-num text-gray-400">工单号: W-09921</span>
+                                                    <span class="font-num">提交时间: 2026-02-15</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center justify-end gap-6 w-1/2">
+                                            <div class="text-right">
+                                                <div class="text-xs font-bold text-gray-500 bg-gray-200 px-2 py-0.5 rounded inline-block mb-1">已完结</div>
+                                            </div>
+                                            <div class="flex gap-2 shrink-0">
+                                                <button class="bg-blue-50 border border-blue-100 text-blue-600 px-3 py-1.5 rounded text-xs font-bold hover:bg-blue-100 transition">查看详情</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="w-[320px] flex-shrink-0 space-y-5">
+                    
+                    <div class="side-card overflow-hidden border-t-4 border-t-blue-600 shadow-sm">
+                        <div class="p-5 border-b border-gray-100 bg-white">
+                            <div class="flex items-center gap-4 mb-5">
+                                <div class="w-14 h-14 rounded-full bg-gray-200 border-2 border-white shadow-inner flex items-center justify-center text-gray-500"><i data-lucide="user" class="w-8 h-8"></i></div>
                                 <div>
                                     <div class="flex items-center gap-2">
-                                        <h2 class="text-2xl font-bold text-white">Lv.3 专家</h2>
+                                        <div class="font-bold text-lg text-gray-800">老王</div>
+                                        <span class="bg-gradient-to-r from-orange-400 to-yellow-500 text-white px-1.5 py-0.5 rounded text-[10px] font-bold shadow-sm italic tracking-wider">Lv.3</span>
+                                        <div class="flex items-center -space-x-1.5 ml-1">
+                                            <div class="w-5 h-5 rounded-full bg-orange-100 border border-white flex items-center justify-center relative z-20 shadow-sm" title="打卡达人">
+                                                <i data-lucide="flame" class="w-3 h-3 text-orange-500"></i>
+                                            </div>
+                                            <div class="w-5 h-5 rounded-full bg-blue-100 border border-white flex items-center justify-center relative z-10 shadow-sm" title="勤学标兵">
+                                                <i data-lucide="book" class="w-3 h-3 text-blue-500"></i>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="text-blue-200 text-sm mt-1">累计获得成长值：<span class="font-num font-bold text-white">3,200</span></div>
+                                    <div class="text-[10px] text-gray-400 mt-1 cursor-pointer hover:text-blue-600 flex items-center gap-1">
+                                        <i data-lucide="edit-2" class="w-3 h-3"></i> 添加签名...
+                                    </div>
                                 </div>
                             </div>
-                            <button class="bg-white/10 hover:bg-white/20 text-white border border-white/30 px-4 py-1.5 rounded-full text-xs transition backdrop-blur-md flex items-center gap-1">
-                                查看等级权益 <i data-lucide="chevron-right" class="w-3 h-3"></i>
-                            </button>
-                        </div>
-
-                        <div class="z-10">
-                            <div class="flex justify-between text-sm mb-2 text-blue-100">
-                                <span>当前成长值 <span class="text-white font-bold text-lg font-num">2,450</span></span>
-                                <span>距离 Lv.4 还需 <span class="text-white font-bold font-num">550</span></span>
-                            </div>
-                            <div class="w-full h-3 bg-black/20 rounded-full overflow-hidden backdrop-blur-sm">
-                                <div class="h-full bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full progress-bar relative" style="width: 82%;">
-                                    <div class="absolute right-0 top-0 bottom-0 w-1 bg-white/50 shadow-[0_0_10px_white]"></div>
+                            
+                            <div class="grid grid-cols-2 gap-4 text-center mt-2">
+                                <div class="bg-blue-50/50 p-3 rounded-lg border border-blue-50 relative overflow-hidden">
+                                    <i data-lucide="wallet" class="absolute -right-2 -bottom-2 w-10 h-10 text-blue-500 opacity-5"></i>
+                                    <div class="text-xs text-gray-500 mb-1">积分余额</div>
+                                    <div class="font-bold text-2xl text-blue-600 font-num">2,450</div>
+                                    <button class="mt-2 bg-blue-600 text-white text-[10px] px-4 py-1 rounded-full shadow hover:bg-blue-700 transition">兑换筑力值</button>
+                                </div>
+                                <div class="bg-gray-50 p-3 rounded-lg border border-gray-100 relative overflow-hidden">
+                                    <i data-lucide="trending-up" class="absolute -right-2 -bottom-2 w-10 h-10 text-gray-400 opacity-10"></i>
+                                    <div class="text-xs text-gray-500 mb-1">全站排位</div>
+                                    <div class="font-bold text-2xl text-gray-800 font-num">15<span class="text-sm font-normal text-gray-500 ml-0.5">%</span></div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-
-                    <div class="col-span-4 energy-card-bg rounded-xl p-6 shadow-lg flex flex-col justify-between h-[200px] relative">
-                        <i data-lucide="zap" class="w-48 h-48 text-white energy-bg-icon"></i>
-                        
-                        <div class="z-10">
-                            <div class="text-xs font-bold text-white/80 uppercase tracking-wider mb-1">积分余额</div>
-                            <div class="text-5xl font-black font-num text-white leading-none">2,750</div>
-                            <div class="mt-2 inline-flex items-center bg-black/20 px-2 py-1 rounded text-[10px] text-white/90">
-                                <i data-lucide="alert-triangle" class="w-3 h-3 mr-1 text-yellow-300"></i> 即将过期: 50 (3天后)
-                            </div>
-                        </div>
-
-                        <div class="z-10 flex items-end justify-between">
-                             <div>
-                                <div class="text-[10px] text-orange-100">筑力值余额</div>
-                                <div class="text-xl font-bold text-white font-num flex items-center gap-1">
-                                    120 <span class="text-[10px] font-normal opacity-80">个</span>
-                                </div>
-                             </div>
-                             <button onclick="openExchangeModal()" class="bg-white text-orange-600 px-4 py-2 rounded font-bold text-sm hover:bg-orange-50 transition shadow-md">
-                                 兑换筑力值
-                             </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="claim-bar" class="bg-white rounded-xl shadow-sm border border-orange-100 p-4 flex items-center justify-between relative overflow-hidden">
-                    <div class="absolute left-0 top-0 bottom-0 w-1 bg-orange-500"></div>
-                    <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 bg-orange-50 rounded-full flex items-center justify-center text-orange-500">
-                            <i data-lucide="gift" class="w-5 h-5"></i>
-                        </div>
-                        <div>
-                            <div class="font-bold text-gray-800 text-sm">你有 2 项任务奖励未领取</div>
-                            <div class="text-xs text-gray-500">共计 <span class="text-orange-600 font-bold font-num">300</span> 积分，15天后自动失效</div>
-                        </div>
-                    </div>
-                    <button onclick="claimRewards()" class="bg-orange-500 text-white px-6 py-2 rounded text-sm font-bold hover:bg-orange-600 transition shadow-sm">
-                        一键领取
-                    </button>
-                </div>
-
-                <div class="grid grid-cols-12 gap-6">
-                    
-                    <div class="col-span-8 bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                        <div class="flex justify-between items-center mb-5">
-                            <h3 class="font-bold text-gray-800 flex items-center gap-2">
-                                <div class="w-1 h-4 bg-cyan-600 rounded-full"></div> 课程学习进度
-                            </h3>
-                            <a href="#" class="text-xs text-gray-500 hover:text-cyan-600">去学习中心 ></a>
                         </div>
                         
-                        <div class="space-y-4">
-                            <div class="flex gap-4 items-center group cursor-pointer hover:bg-gray-50 p-2 rounded -mx-2 transition">
-                                <div class="w-24 h-16 bg-gray-200 rounded-lg overflow-hidden relative flex-shrink-0">
-                                    <img src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=300&auto=format&fit=crop" class="w-full h-full object-cover">
-                                    <div class="absolute inset-0 bg-black/20 flex items-center justify-center"><i data-lucide="play-circle" class="w-6 h-6 text-white opacity-80"></i></div>
+                        <div class="p-5 bg-gradient-to-b from-orange-50/30 to-white">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="text-sm font-bold text-gray-700 flex items-center gap-1.5"><i data-lucide="gift" class="w-4 h-4 text-orange-500"></i> 可兑换权益</span>
+                                <button class="text-[10px] border border-orange-500 text-orange-600 px-2 py-1 rounded hover:bg-orange-50 transition flex items-center gap-1">兑换权益 </i></button>
+                            </div>
+                            <div class="flex gap-2">
+                                <div class="bg-white border border-orange-100 p-2.5 rounded-lg flex-1 flex flex-col items-center justify-center cursor-pointer hover:border-orange-300 hover:shadow-sm transition">
+                                    <i data-lucide="headphones" class="w-6 h-6 text-orange-400 mb-1.5"></i>
+                                    <span class="text-[10px] text-gray-600 font-bold">专属客服通道</span>
+                                    <span class="text-[8px] text-orange-500 bg-orange-50 px-1 rounded mt-1">1000 积分</span>
                                 </div>
-                                <div class="flex-1">
-                                    <div class="flex justify-between mb-1">
-                                        <div class="text-sm font-bold text-gray-800">2026年建筑供应链数字化转型必修课</div>
-                                        <span class="text-xs text-cyan-600 font-bold">75%</span>
-                                    </div>
-                                    <div class="w-full h-1.5 bg-gray-100 rounded-full">
-                                        <div class="h-full bg-cyan-500 rounded-full" style="width: 75%"></div>
-                                    </div>
-                                    <div class="flex justify-between mt-1">
-                                        <span class="text-[10px] text-gray-400">上次学到：第三章 供应链协同</span>
-                                        <span class="text-[10px] text-orange-500">+10 积分/每课时</span>
-                                    </div>
+                                <div class="bg-white border border-orange-100 p-2.5 rounded-lg flex-1 flex flex-col items-center justify-center cursor-pointer hover:border-orange-300 hover:shadow-sm transition">
+                                    <i data-lucide="credit-card" class="w-6 h-6 text-orange-400 mb-1.5"></i>
+                                    <span class="text-[10px] text-gray-600 font-bold">50元京东E卡</span>
+                                    <span class="text-[8px] text-orange-500 bg-orange-50 px-1 rounded mt-1">2000 积分</span>
                                 </div>
                             </div>
-                            <div class="flex gap-4 items-center group cursor-pointer hover:bg-gray-50 p-2 rounded -mx-2 transition">
-                                <div class="w-24 h-16 bg-gray-200 rounded-lg overflow-hidden relative flex-shrink-0">
-                                    <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=300&auto=format&fit=crop" class="w-full h-full object-cover">
+                        </div>
+
+                        <div class="p-5 bg-gray-50 border-t border-gray-100">
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="text-sm font-bold text-gray-800">每日签到</span>
+                                <span class="text-[10px] text-gray-500">连续签到奖励倍增</span>
+                            </div>
+                            <div class="flex justify-between items-center mb-4 relative px-2">
+                                <div class="absolute left-6 right-6 top-1/2 h-0.5 bg-gray-200 -z-10 -translate-y-1/2"></div>
+                                <div class="flex flex-col items-center gap-1 z-10">
+                                    <div class="sign-bubble done"><i data-lucide="check" class="w-4 h-4"></i></div><span class="text-[10px] text-gray-500">昨天</span>
                                 </div>
-                                <div class="flex-1">
-                                    <div class="flex justify-between mb-1">
-                                        <div class="text-sm font-bold text-gray-800">采购商务谈判技巧进阶</div>
-                                        <span class="text-xs text-gray-400">30%</span>
+                                <div class="flex flex-col items-center gap-1 z-10">
+                                    <div class="sign-bubble active">+10</div><span class="text-[10px] font-bold text-orange-600">今天</span>
+                                </div>
+                                <div class="flex flex-col items-center gap-1 z-10">
+                                    <div class="sign-bubble future">+20</div><span class="text-[10px] text-gray-400">明天</span>
+                                </div>
+                                <div class="flex flex-col items-center gap-1 z-10">
+                                    <div class="sign-bubble future"><i data-lucide="gift" class="w-4 h-4 text-gray-300"></i></div><span class="text-[10px] text-gray-400">第4天</span>
+                                </div>
+                            </div>
+                            <button class="w-full bg-blue-600 text-white py-2 rounded-lg font-bold text-sm shadow hover:bg-blue-700 transition">立即签到</button>
+                        </div>
+                    </div>
+
+                    <div class="rounded-lg overflow-hidden relative cursor-pointer group shadow-sm border border-indigo-100 mt-4">
+                        <div class="absolute inset-0 bg-gradient-to-r from-indigo-600 to-blue-500 opacity-90"></div>
+                        <div class="absolute right-[-20px] top-[-20px] w-24 h-24 bg-white opacity-10 rounded-full blur-xl group-hover:scale-150 transition duration-500"></div>
+                        <div class="relative p-5 text-white z-10 flex items-center justify-between">
+                            <div>
+                                <div class="font-bold text-sm mb-1 flex items-center gap-1"><i data-lucide="zap" class="w-4 h-4 text-yellow-300"></i> 提效工具推荐</div>
+                                <div class="text-lg font-bold tracking-wide mt-2">云小易 AI 客服</div>
+                                <div class="text-[10px] opacity-80 mt-1">智能问答，7x24h 伴您同行</div>
+                            </div>
+                            <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm shadow-inner group-hover:-translate-y-1 transition"><i data-lucide="bot" class="w-6 h-6"></i></div>
+                        </div>
+                    </div>
+
+                    <div class="side-card !mb-0 shadow-sm">
+                        <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                            <div class="text-sm font-bold text-gray-800 flex items-center gap-1.5"><i data-lucide="rss" class="w-4 h-4 text-blue-500"></i> 内容订阅</div>
+                        </div>
+                        <div class="p-4">
+                            <div class="space-y-4 mb-4 pb-4 border-b border-dashed border-gray-200">
+                                <div class="text-xs font-bold text-gray-500 mb-2">热门专栏订阅</div>
+                                <div class="flex items-center justify-between group">
+                                    <div class="flex items-start gap-2 max-w-[75%]">
+                                        <div class="w-8 h-8 rounded bg-blue-50 text-blue-500 flex items-center justify-center shrink-0"><i data-lucide="book-open" class="w-4 h-4"></i></div>
+                                        <div>
+                                            <div class="text-xs font-bold text-gray-800 truncate cursor-pointer hover:text-blue-600">《供应链管理洞察》</div>
+                                            <div class="text-[10px] text-gray-400 mt-0.5">每周二更新行业研报</div>
+                                        </div>
                                     </div>
-                                    <div class="w-full h-1.5 bg-gray-100 rounded-full">
-                                        <div class="h-full bg-gray-300 rounded-full" style="width: 30%"></div>
+                                    <button class="btn-subscribe bg-white border border-blue-500 text-blue-600 px-3 py-1 rounded text-[10px] font-bold hover:bg-blue-50 transition" onclick="toggleSub(this)">订阅</button>
+                                </div>
+                                <div class="flex items-center justify-between group">
+                                    <div class="flex items-start gap-2 max-w-[75%]">
+                                        <div class="w-8 h-8 rounded bg-orange-50 text-orange-500 flex items-center justify-center shrink-0"><i data-lucide="calendar" class="w-4 h-4"></i></div>
+                                        <div>
+                                            <div class="text-xs font-bold text-gray-800 truncate cursor-pointer hover:text-orange-500">平台新规/政策通知</div>
+                                            <div class="text-[10px] text-gray-400 mt-0.5">第一时间获取规则变动</div>
+                                        </div>
                                     </div>
-                                    <div class="flex justify-between mt-1">
-                                        <span class="text-[10px] text-gray-400">上次学到：第一章 准备工作</span>
-                                        <span class="text-[10px] text-orange-500">+10 积分/每课时</span>
+                                    <button class="btn-subscribe bg-gray-100 border border-gray-200 text-gray-500 px-3 py-1 rounded text-[10px] font-bold cursor-default" onclick="toggleSub(this)">已订阅</button>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="text-xs font-bold text-gray-500 mb-2">猜你想看</div>
+                                <div class="space-y-2.5">
+                                    <div class="flex items-start gap-2 cursor-pointer group">
+                                        <div class="w-1.5 h-1.5 bg-blue-500 rounded-full mt-1.5 flex-shrink-0 group-hover:scale-150 transition"></div>
+                                        <div class="text-xs text-gray-700 group-hover:text-blue-600 line-clamp-2 leading-relaxed">2026年建筑行业供应链管理发展白皮书正式发布，解读新趋势</div>
+                                    </div>
+                                    <div class="flex items-start gap-2 cursor-pointer group">
+                                        <div class="w-1.5 h-1.5 bg-gray-300 rounded-full mt-1.5 flex-shrink-0 group-hover:bg-blue-500 transition"></div>
+                                        <div class="text-xs text-gray-700 group-hover:text-blue-600 line-clamp-2 leading-relaxed">指南：如何快速完成企业实名认证及银行开户操作？</div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="col-span-4 bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                        <div class="flex justify-between items-center mb-5">
-                            <h3 class="font-bold text-gray-800 flex items-center gap-2">
-                                <div class="w-1 h-4 bg-purple-600 rounded-full"></div> 个人贡献
-                            </h3>
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="bg-purple-50 rounded-lg p-3 text-center cursor-pointer hover:bg-purple-100 transition">
-                                <div class="flex justify-center mb-2"><div class="w-8 h-8 bg-white rounded-full flex items-center justify-center text-purple-600 shadow-sm"><i data-lucide="message-square-plus" class="w-4 h-4"></i></div></div>
-                                <div class="text-xs text-gray-500 mb-1">云声建议</div>
-                                <div class="text-lg font-bold text-gray-800 font-num">12</div>
-                                <div class="text-xs text-purple-600 mt-1">3条被采纳</div>
-                            </div>
-                            <div class="bg-blue-50 rounded-lg p-3 text-center cursor-pointer hover:bg-blue-100 transition">
-                                <div class="flex justify-center mb-2"><div class="w-8 h-8 bg-white rounded-full flex items-center justify-center text-blue-600 shadow-sm"><i data-lucide="file-text" class="w-4 h-4"></i></div></div>
-                                <div class="text-xs text-gray-500 mb-1">案例分享</div>
-                                <div class="text-lg font-bold text-gray-800 font-num">5</div>
-                                <div class="text-xs text-blue-600 mt-1">4个已通过</div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
-
-                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 min-h-[300px]">
-                    <div class="flex justify-between items-center border-b border-gray-100 mb-4">
-                        <div class="flex gap-6">
-                            <div class="task-tab active py-2 cursor-pointer" onclick="switchTab(this, 'all')">全部任务</div>
-                            <div class="task-tab py-2 text-gray-500 hover:text-cyan-600 cursor-pointer transition" onclick="switchTab(this, 'main')">主线任务</div>
-                            <div class="task-tab py-2 text-gray-500 hover:text-cyan-600 cursor-pointer transition" onclick="switchTab(this, 'daily')">日常任务</div>
-                        </div>
-                        <a href="#" class="text-xs text-gray-500 hover:text-cyan-600">前往任务中心 ></a>
-                    </div>
-
-                    <div id="taskListContainer" class="grid grid-cols-2 gap-4">
-                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-transparent hover:border-cyan-100 hover:bg-cyan-50/30 transition group">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-blue-500 shadow-sm border border-gray-100"><i data-lucide="book-open" class="w-5 h-5"></i></div>
-                                <div>
-                                    <div class="text-sm font-bold text-gray-800 flex items-center gap-2">
-                                        主线课程学习-采购方 
-                                        <span class="bg-blue-100 text-blue-600 text-[10px] px-1.5 py-0.5 rounded">主线</span>
-                                    </div>
-                                    <div class="text-xs text-gray-500 mt-0.5">完成任意一门采购相关课程学习</div>
-                                </div>
-                            </div>
-                            <div class="flex items-center gap-4">
-                                <div class="text-right">
-                                    <div class="text-sm font-bold text-orange-500 font-num">+60</div>
-                                    <div class="text-[10px] text-gray-400">积分奖励</div>
-                                </div>
-                                <button class="bg-cyan-600 text-white px-4 py-1.5 rounded text-xs hover:bg-cyan-500 shadow-sm transition">去学习</button>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-transparent hover:border-cyan-100 hover:bg-cyan-50/30 transition group">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-purple-500 shadow-sm border border-gray-100"><i data-lucide="message-square" class="w-5 h-5"></i></div>
-                                <div>
-                                    <div class="text-sm font-bold text-gray-800 flex items-center gap-2">
-                                        提交云声建议
-                                        <span class="bg-purple-100 text-purple-600 text-[10px] px-1.5 py-0.5 rounded">日常</span>
-                                    </div>
-                                    <div class="text-xs text-gray-500 mt-0.5">每日首条建议审核通过后发放</div>
-                                </div>
-                            </div>
-                            <div class="flex items-center gap-4">
-                                <div class="text-right">
-                                    <div class="text-sm font-bold text-orange-500 font-num">+30</div>
-                                    <div class="text-[10px] text-gray-400">剩余 1/1</div>
-                                </div>
-                                <button class="bg-white border border-cyan-600 text-cyan-600 px-4 py-1.5 rounded text-xs hover:bg-cyan-50 transition">去提交</button>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-transparent hover:border-cyan-100 hover:bg-cyan-50/30 transition group">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-green-500 shadow-sm border border-gray-100"><i data-lucide="log-in" class="w-5 h-5"></i></div>
-                                <div>
-                                    <div class="text-sm font-bold text-gray-800 flex items-center gap-2">
-                                        每日登录门户
-                                        <span class="bg-green-100 text-green-600 text-[10px] px-1.5 py-0.5 rounded">日常</span>
-                                    </div>
-                                    <div class="text-xs text-gray-500 mt-0.5">访问门户首页即可完成</div>
-                                </div>
-                            </div>
-                            <div class="flex items-center gap-4">
-                                <div class="text-right">
-                                    <div class="text-sm font-bold text-gray-400 font-num">+5</div>
-                                    <div class="text-[10px] text-gray-400">已完成</div>
-                                </div>
-                                <button class="bg-gray-200 text-gray-400 px-4 py-1.5 rounded text-xs cursor-not-allowed">已领取</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="exchangeModal" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-mask">
-                    <div class="bg-white rounded-xl shadow-2xl w-[400px] overflow-hidden transform transition-all scale-95" id="modalContent">
-                        <div class="bg-gradient-to-r from-orange-500 to-orange-600 px-6 py-4 flex justify-between items-center">
-                            <div class="text-white font-bold">兑换筑力值</div>
-                            <i data-lucide="x" class="w-5 h-5 text-white/80 cursor-pointer hover:text-white" onclick="closeExchangeModal()"></i>
-                        </div>
-                        
-                        <div class="p-6">
-                            <div class="bg-orange-50 border border-orange-100 rounded-lg p-3 text-xs text-orange-800 flex items-center gap-2 mb-6">
-                                <i data-lucide="info" class="w-4 h-4 text-orange-500"></i>
-                                <span>当前汇率：<span class="font-bold">20 积分 = 1 筑力值</span></span>
-                            </div>
-
-                            <div class="space-y-4">
-                                <div>
-                                    <label class="block text-sm text-gray-500 mb-1">支出积分 (可用: 2,750)</label>
-                                    <div class="relative">
-                                        <input type="number" id="pointsInput" value="1000" oninput="calculateExchange()" class="w-full border border-gray-300 rounded-lg p-3 pr-12 font-num font-bold text-gray-800 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500">
-                                        <span class="absolute right-3 top-3.5 text-xs text-gray-400">积分</span>
-                                    </div>
-                                </div>
-
-                                <div class="flex justify-center">
-                                    <i data-lucide="arrow-down" class="w-5 h-5 text-gray-300"></i>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm text-gray-500 mb-1">获得筑力值</label>
-                                    <div class="relative">
-                                        <input type="text" id="zhuliOutput" value="50" readonly class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 pr-12 font-num font-bold text-orange-600">
-                                        <span class="absolute right-3 top-3.5 text-xs text-gray-400">个</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="p-4 border-t border-gray-100 flex gap-3 bg-gray-50">
-                            <button onclick="closeExchangeModal()" class="flex-1 py-2 border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-white transition">取消</button>
-                            <button onclick="confirmExchange()" class="flex-1 py-2 bg-orange-500 text-white rounded-lg text-sm font-bold hover:bg-orange-600 shadow-md transition">确认兑换</button>
-                        </div>
-                    </div>
-                </div>
-
             </main>
         </div>
 
     </div>
 
     <script>
+        // 渲染图标
         lucide.createIcons();
-        
-        // 视图切换逻辑
-        function switchView(viewName) {
+
+        // ======= 视图切换逻辑 =======
+        function switchView(viewId) {
+            // 隐藏所有页面，显示目标页面
             $('.page-view').removeClass('active');
-            $('#view-' + viewName).addClass('active');
-            
-            // 确保切换视图后图标正确渲染（针对动态插入的内容）
+            $('#view-' + viewId).addClass('active');
+
+            // 动态切换后重新渲染图标防止丢失
             setTimeout(() => {
                 lucide.createIcons();
             }, 50);
         }
 
-        /* === 成长中心相关逻辑 === */
-        
-        // 任务Tab切换
-        function switchTab(element, type) {
-            $('.task-tab').removeClass('active').addClass('text-gray-500 hover:text-cyan-600');
-            $(element).addClass('active').removeClass('text-gray-500 hover:text-cyan-600');
-            // 此处可添加实际的列表筛选逻辑
-        }
-
-        // 领取奖励
-        function claimRewards() {
-            const btn = $('#claim-bar button');
-            btn.text('领取中...').addClass('opacity-75 cursor-wait');
+        // ======= 个人服务台：交互逻辑 =======
+        $(document).ready(function() {
             
-            setTimeout(() => {
-                $('#claim-bar').fadeOut(300, function() {
-                    $(this).replaceWith('<div class="bg-green-50 border border-green-200 text-green-700 p-4 rounded-xl text-center text-sm font-bold">🎉 领取成功！积分已到账</div>');
-                    // 模拟刷新积分显示
-                    $('.text-5xl').text('3,050');
-                });
-            }, 800);
-        }
-
-        // 模态框逻辑
-        function openExchangeModal() {
-            $('#exchangeModal').removeClass('hidden').addClass('flex');
-            // 简单动画
-            $('#modalContent').removeClass('scale-95').addClass('scale-100');
-        }
-
-        function closeExchangeModal() {
-            $('#modalContent').removeClass('scale-100').addClass('scale-95');
-            setTimeout(() => {
-                $('#exchangeModal').addClass('hidden').removeClass('flex');
-            }, 100);
-        }
-
-        function calculateExchange() {
-            const points = $('#pointsInput').val();
-            const rate = 20;
-            const zhuli = Math.floor(points / rate);
-            $('#zhuliOutput').val(zhuli);
-        }
-
-        function confirmExchange() {
-            const points = $('#pointsInput').val();
-            const zhuli = $('#zhuliOutput').val();
+            // 1. 任务折叠/展开逻辑 (默认展开状态)
+            $('#more-tasks').addClass('open');
+            $('#icon-task-chevron').addClass('rotate-180');
             
-            if(points > 2750) {
-                alert('积分余额不足！');
-                return;
+            $('#btn-toggle-tasks').click(function() {
+                const target = $('#more-tasks');
+                const icon = $('#icon-task-chevron');
+                const textSpan = $(this).find('span');
+                
+                if (target.hasClass('open')) {
+                    target.removeClass('open');
+                    icon.removeClass('rotate-180');
+                    textSpan.text('展开全部挑战 (12)');
+                } else {
+                    target.addClass('open');
+                    icon.addClass('rotate-180');
+                    textSpan.text('收起任务');
+                }
+            });
+
+            // 2. 学习记录折叠/展开逻辑
+            $('#btn-toggle-learn').click(function() {
+                const target = $('#more-learning');
+                const icon = $('#icon-learn-chevron');
+                const textSpan = $(this).find('span');
+                
+                if (target.hasClass('open')) {
+                    target.removeClass('open');
+                    icon.removeClass('rotate-180');
+                    textSpan.text('展开更多学习详情');
+                } else {
+                    target.addClass('open');
+                    icon.addClass('rotate-180');
+                    textSpan.text('收起详情');
+                }
+            });
+            
+            // 3. Header Toggle (点整个头部也可以收缩)
+            $('.toggle-btn').click(function() {
+                if($(this).data('target') === '#task-body') {
+                    $('#task-body').slideToggle(300);
+                    const icon = $(this).find('.icon-chevron');
+                    if (icon.hasClass('rotate-180')) icon.removeClass('rotate-180');
+                    else icon.addClass('rotate-180');
+                } else if ($(this).data('target') === '#learn-body') {
+                    $('#learn-body').slideToggle(300);
+                    const icon = $(this).find('.icon-chevron');
+                    if (icon.hasClass('rotate-180')) icon.removeClass('rotate-180');
+                    else icon.addClass('rotate-180');
+                }
+            });
+            
+            // 4. Tab切换效果
+            $('.tab-item').click(function(){
+                $(this).siblings().removeClass('active');
+                $(this).addClass('active');
+            });
+        });
+
+        // 5. 订阅按钮交互
+        function toggleSub(btn) {
+            const $btn = $(btn);
+            if($btn.text() === '订阅') {
+                $btn.text('已订阅')
+                    .removeClass('bg-white border-blue-500 text-blue-600 hover:bg-blue-50')
+                    .addClass('bg-gray-100 border-gray-200 text-gray-500 cursor-default');
+                alert('订阅成功！专栏更新时将给您发送提醒。');
             }
-
-            alert(`兑换成功！\n消耗 ${points} 积分\n获得 ${zhuli} 筑力值`);
-            closeExchangeModal();
-            // 模拟刷新数据
-            $('.text-5xl').text((2750 - points).toLocaleString());
         }
     </script>
 </body>
